@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #f9f8f6;
+    --surface: #ffffff;
+    --surface-2: #f3f2ef;
+    --border: #e8e5e0;
+    --border-light: #f0ede8;
+    --text-primary: #1a1916;
+    --text-secondary: #6b6760;
+    --text-tertiary: #a09d98;
+    --accent: #2d6a4f;
+    --accent-light: #e8f4ee;
+    --accent-2: #e76f51;
+    --blue: #3b5bdb;
+    --blue-light: #e8f0fe;
+    --purple: #7c3aed;
+    --purple-light: #f3e8ff;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-sm transition-colors hover:bg-[#245a42] active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-surface border border-border text-text-secondary text-sm font-medium rounded-sm transition-colors hover:bg-surface-2 hover:border-text-tertiary;
+  }
+
+  .card {
+    @apply bg-surface border border-border rounded-[10px] shadow-card;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 bg-surface border border-border rounded-sm text-[13.5px] text-text-primary font-sans outline-none transition-colors focus:border-accent placeholder:text-text-tertiary;
+  }
+
+  .label {
+    @apply block text-xs font-semibold text-text-secondary mb-1.5 tracking-wide;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded;
+  }
+
+  .badge-matchup { @apply bg-blue-light text-blue; }
+  .badge-analysis { @apply bg-accent-light text-accent; }
+  .badge-stats { @apply bg-accent2-light text-accent2; }
+
+  .outcome-win { @apply bg-accent-light text-accent; }
+  .outcome-loss { @apply bg-accent2-light text-accent2; }
+  .outcome-push { @apply bg-surface-2 text-text-secondary; }
+  .outcome-pending { @apply bg-surface-2 text-text-tertiary border border-border; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in { animation: fadeIn 0.2s ease both; }
