@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
+import type { Study } from '@/types'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -23,11 +24,13 @@ export async function POST(req: NextRequest) {
 
   // Fetch study from DB (enforces RLS — user can only access their own)
   const supabase = createClient()
-  const { data: study, error } = await supabase
+  const { data, error } = await supabase
     .from('studies')
     .select('*')
     .eq('id', studyId)
     .single()
+
+  const study = data as Study | null
 
   if (error || !study) {
     return NextResponse.json({ error: 'Study not found' }, { status: 404 })
