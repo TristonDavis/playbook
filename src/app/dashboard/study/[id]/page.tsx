@@ -36,17 +36,20 @@ export default function StudyPage() {
     setSaving(true)
     const supabase = createClient()
 
-    if (id === 'new') {
-      const { data, error } = await supabase
-        .from('studies')
-        .insert({ ...updates, title: updates.title || 'Untitled Study', type: updates.type || 'analysis', sport: updates.sport || 'NFL', tags: updates.tags || [] })
-        .select()
-        .single()
-      if (data) router.replace(`/dashboard/study/${data.id}`)
-    } else {
-      await supabase.from('studies').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id)
-      setStudy(prev => prev ? { ...prev, ...updates } : null)
-    }
+if (id === 'new') {
+  const { data, error } = (await supabase
+    .from('studies')
+    .insert({ ...updates, title: updates.title || 'Untitled Study', type: updates.type || 'analysis', sport: updates.sport || 'NFL', tags: updates.tags || [] } as any)
+    .select()
+    .single()) as { data: Study | null; error: any }
+
+  if (data) router.replace(`/dashboard/study/${data.id}`)
+} else {
+await (supabase as any)
+  .from('studies')
+  .update({ ...updates, updated_at: new Date().toISOString() })
+  .eq('id', id)
+}
     setSaving(false)
   }, [id, router])
 

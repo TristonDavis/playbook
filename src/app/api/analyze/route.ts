@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   // Fetch study from DB (enforces RLS — user can only access their own)
   const supabase = createClient()
-  const { data, error } = await supabase
+  const { data, error } = await (await supabase)
     .from('studies')
     .select('*')
     .eq('id', studyId)

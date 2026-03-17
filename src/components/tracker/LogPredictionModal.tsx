@@ -57,7 +57,7 @@ export default function LogPredictionModal({ open, onClose, onSaved }: Props) {
       linked_study_id: form.linked_study_id || null,
       linked_study_title: linkedStudy?.title || null,
       notes: form.notes || null,
-    })
+    } as any)
 
     setSaving(false)
     setForm(f => ({ ...f, game: '', pick: '', notes: '', linked_study_id: '' }))

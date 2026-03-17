@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const type = searchParams.get('type')
 
-  const supabase = createClient()
+  const supabase = await createClient()
   let query = supabase
     .from('studies')
     .select('*')
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data, error } = await supabase
     .from('studies')
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       total: body.total || null,
       tags: body.tags || [],
       pinned: false,
-    })
+    } as any)
     .select()
     .single()
 
