@@ -10,7 +10,7 @@ const anthropic = new Anthropic({
 
 export async function POST(req: NextRequest) {
   // Auth check
-  const { userId } = auth()
+  const { userId } = await auth() // ✅ await required in Next.js 15 / Clerk v5
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
   }
 
   // Fetch study from DB (enforces RLS — user can only access their own)
-  const supabase = createClient()
-  const { data, error } = await (await supabase)
+  const supabase = await createClient() // ✅ await once, use directly
+  const { data, error } = await supabase
     .from('studies')
     .select('*')
     .eq('id', studyId)
