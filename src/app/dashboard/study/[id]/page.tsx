@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useAuth } from '@clerk/nextjs'
 import { createClient } from '@/lib/supabase/client'
-import { Study } from '@/types'
+import { Study, StudyInsert } from '@/types'
 import StudyEditor from '@/components/editor/StudyEditor'
 import RightPanel from '@/components/editor/RightPanel'
 import EditorToolbar from '@/components/editor/EditorToolbar'
@@ -12,6 +13,7 @@ import StudyListSidebar from '@/components/editor/StudyListSidebar'
 export default function StudyPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
+  const { userId } = useAuth()
   const [study, setStudy] = useState<Study | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -33,19 +35,33 @@ export default function StudyPage() {
   }, [id])
 
   const handleSave = useCallback(async (updates: Partial<Study>) => {
+    if (!userId) return
     setSaving(true)
     const supabase = createClient()
 
 if (id === 'new') {
-  const { data, error } = (await supabase
+  const studyInsert: StudyInsert = {
+    user_id: userId,
+    title: updates.title || 'Untitled Study',
+    type: updates.type || 'analysis',
+    sport: updates.sport || 'NFL',
+    body: updates.body || '',
+    confidence: updates.confidence || 50,
+    spread: updates.spread ?? null,
+    total: updates.total ?? null,
+    tags: updates.tags || [],
+    pinned: updates.pinned ?? false,
+  }
+
+  const { data, error } = await supabase
     .from('studies')
-    .insert({ ...updates, title: updates.title || 'Untitled Study', type: updates.type || 'analysis', sport: updates.sport || 'NFL', tags: updates.tags || [] } as any)
+    .insert(studyInsert)
     .select()
-    .single()) as { data: Study | null; error: any }
+    .single()
 
   if (data) router.replace(`/dashboard/study/${data.id}`)
 } else {
-await (supabase as any)
+await supabase
   .from('studies')
   .update({ ...updates, updated_at: new Date().toISOString() })
   .eq('id', id)

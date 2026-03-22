@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
+import { useAuth } from '@clerk/nextjs'
 import { createClient } from '@/lib/supabase/client'
-import { Study, PickType, Outcome } from '@/types'
+import { Study, PickType, Outcome, PredictionInsert } from '@/types'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export default function LogPredictionModal({ open, onClose, onSaved }: Props) {
+  const { userId } = useAuth()
   const [studies, setStudies] = useState<Study[]>([])
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
@@ -41,12 +43,14 @@ export default function LogPredictionModal({ open, onClose, onSaved }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!form.game.trim()) return
+    if (!userId) return
     setSaving(true)
 
     const linkedStudy = studies.find(s => s.id === form.linked_study_id)
     const supabase = createClient()
 
-    await supabase.from('predictions').insert({
+    const prediction: PredictionInsert = {
+      user_id: userId,
       game: form.game,
       sport: form.sport,
       date: form.date,
@@ -57,7 +61,9 @@ export default function LogPredictionModal({ open, onClose, onSaved }: Props) {
       linked_study_id: form.linked_study_id || null,
       linked_study_title: linkedStudy?.title || null,
       notes: form.notes || null,
-    } as any)
+    }
+
+    await supabase.from('predictions').insert(prediction)
 
     setSaving(false)
     setForm(f => ({ ...f, game: '', pick: '', notes: '', linked_study_id: '' }))

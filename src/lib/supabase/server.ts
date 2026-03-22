@@ -1,11 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { auth } from '@clerk/nextjs/server'
 import { cookies } from 'next/headers'
-import { Database } from '@/types'
+import type { Database } from '@/types'
 
 // Use in Server Components, Server Actions, and API Routes
 export async function createClient() {
   const cookieStore = await cookies()
+  type CookieSetOptions = Parameters<typeof cookieStore.set>[2]
   let accessToken: string | null = null
 
   try {
@@ -17,7 +18,7 @@ export async function createClient() {
     accessToken = null
   }
 
-  return createServerClient<Database>(
+  return createServerClient<Database, 'public', any>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -32,10 +33,10 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
+        setAll(cookiesToSet: Array<{ name: string; value: string; options?: CookieSetOptions }>) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options as any)
+              cookieStore.set(name, value, options)
             )
           } catch {
             // Called from a Server Component — cookies can't be set.
@@ -49,7 +50,7 @@ export async function createClient() {
 
 // Use in API routes that need admin access (bypasses RLS)
 export function createAdminClient() {
-  return createServerClient<Database>(
+  return createServerClient<Database, 'public', any>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { cookies: { getAll: () => [], setAll: () => {} } }

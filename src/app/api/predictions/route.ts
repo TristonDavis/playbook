@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { PredictionInsert } from '@/types'
 
 // GET /api/predictions
 export async function GET() {
@@ -25,21 +26,23 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
   const supabase = await createClient()
 
+  const prediction: PredictionInsert = {
+    user_id: userId,
+    game: body.game,
+    sport: body.sport,
+    date: body.date,
+    type: body.type,
+    pick: body.pick,
+    confidence: body.confidence,
+    outcome: body.outcome || 'pending',
+    linked_study_id: body.linked_study_id || null,
+    linked_study_title: body.linked_study_title || null,
+    notes: body.notes || null,
+  }
+
   const { data, error } = await supabase
     .from('predictions')
-    .insert({
-      user_id: userId,
-      game: body.game,
-      sport: body.sport,
-      date: body.date,
-      type: body.type,
-      pick: body.pick,
-      confidence: body.confidence,
-      outcome: body.outcome || 'pending',
-      linked_study_id: body.linked_study_id || null,
-      linked_study_title: body.linked_study_title || null,
-      notes: body.notes || null,
-    } as any)
+    .insert(prediction)
     .select()
     .single()
 
