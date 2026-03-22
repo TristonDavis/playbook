@@ -1,18 +1,28 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { StudyInsert } from '@/types'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { Database, StudyInsert, StudyType } from '@/types'
 
-// GET /api/studies — list all studies for current user
+type TypedClient = SupabaseClient<Database>
+
+const VALID_STUDY_TYPES: StudyType[] = ['matchup', 'stats', 'analysis']
+
+// GET /api/studies
 export async function GET(req: NextRequest) {
-  const { userId } = auth()
+  const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { searchParams } = new URL(req.url)
-  const type = searchParams.get('type')
+  const supabase = await createClient() as TypedClient
 
-  const supabase = await createClient()
-  let query = supabase
+  const { searchParams } = new URL(req.url)
+  const typeParam = searchParams.get('type')
+  const type = VALID_STUDY_TYPES.includes(typeParam as StudyType)
+    ? (typeParam as StudyType)
+    : null
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let query: any = supabase
     .from('studies')
     .select('*')
     .order('updated_at', { ascending: false })
@@ -21,22 +31,25 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-
   return NextResponse.json(data)
 }
 
-// POST /api/studies — create a new study
+// POST /api/studies
 export async function POST(req: NextRequest) {
-  const { userId } = auth()
+  const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const supabase = await createClient() as TypedClient
   const body = await req.json()
-  const supabase = await createClient()
+
+  const typeValue: StudyType = VALID_STUDY_TYPES.includes(body.type)
+    ? body.type
+    : 'analysis'
 
   const study: StudyInsert = {
     user_id: userId,
     title: body.title || 'Untitled Study',
-    type: body.type || 'analysis',
+    type: typeValue,
     sport: body.sport || 'NFL',
     body: body.body || '',
     confidence: body.confidence || 50,

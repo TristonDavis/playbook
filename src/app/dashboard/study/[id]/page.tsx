@@ -28,7 +28,7 @@ export default function StudyPage() {
     async function load() {
       const supabase = createClient()
       const { data } = await supabase.from('studies').select('*').eq('id', id).single()
-      setStudy(data)
+      setStudy((data as Study) ?? null)
       setLoading(false)
     }
     load()
@@ -59,7 +59,7 @@ if (id === 'new') {
     .select()
     .single()
 
-  if (data) router.replace(`/dashboard/study/${data.id}`)
+  if (data) router.replace(`/dashboard/study/${(data as Study).id}`)
 } else {
 await supabase
   .from('studies')

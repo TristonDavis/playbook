@@ -9,23 +9,34 @@ import { Study, StudyType } from '@/types'
 import { formatDate, cn } from '@/lib/utils'
 
 const TYPE_COLORS: Record<StudyType, string> = {
-  matchup: 'badge-matchup',
+  matchup:  'badge-matchup',
   analysis: 'badge-analysis',
-  stats: 'badge-stats',
+  stats:    'badge-stats',
 }
+
+const VALID_TYPES: StudyType[] = ['matchup', 'stats', 'analysis']
 
 export default function DashboardPage() {
   const searchParams = useSearchParams()
-  const typeFilter = searchParams.get('type') as StudyType | null
+  const rawType = searchParams.get('type')
+  const typeFilter: StudyType | null = VALID_TYPES.includes(rawType as StudyType)
+    ? (rawType as StudyType)
+    : null
 
   const [studies, setStudies] = useState<Study[]>([])
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
+  const [search, setSearch]   = useState('')
 
   useEffect(() => {
     async function load() {
       const supabase = createClient()
-      let query = supabase
+
+      // Build base query — cast to any to allow conditional .eq() without
+      // TypeScript losing the return type through the chained builder.
+      // We explicitly cast data to Study[] on the way out, which is the
+      // safe boundary and matches what the DB actually returns.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query: any = supabase
         .from('studies')
         .select('*')
         .order('updated_at', { ascending: false })
@@ -33,7 +44,7 @@ export default function DashboardPage() {
       if (typeFilter) query = query.eq('type', typeFilter)
 
       const { data } = await query
-      setStudies(data ?? [])
+      setStudies((data as Study[]) ?? [])
       setLoading(false)
     }
     load()
@@ -51,7 +62,9 @@ export default function DashboardPage() {
       <div className="w-[280px] border-r border-border flex flex-col bg-bg flex-shrink-0">
         <div className="px-4 pt-[18px] pb-3 border-b border-border/60 bg-surface">
           <h1 className="text-[17px] font-semibold tracking-tight mb-2.5">
-            {typeFilter ? `${typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)} Studies` : 'All Studies'}
+            {typeFilter
+              ? `${typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)} Studies`
+              : 'All Studies'}
           </h1>
           <div className="flex items-center gap-2 bg-surface-2 border border-border rounded-sm px-2.5 py-1.5">
             <Search size={13} className="text-text-tertiary shrink-0" />
