@@ -30,9 +30,9 @@ export default function DonutChart({ wins, losses, pushes, winRate }: Props) {
     const inner = r * 0.6
 
     const segments = [
-      { value: wins, color: '#2d6a4f' },
-      { value: losses, color: '#e76f51' },
-      { value: pushes, color: '#a09d98' },
+      { value: wins,   color: '#4ADE80' },
+      { value: losses, color: '#F87171' },
+      { value: pushes, color: '#94A3B8' },
     ].filter(s => s.value > 0)
 
     const total = wins + losses + pushes
@@ -41,13 +41,13 @@ export default function DonutChart({ wins, losses, pushes, winRate }: Props) {
       // Empty state ring
       ctx.beginPath()
       ctx.arc(cx, cy, r, 0, 2 * Math.PI)
-      ctx.fillStyle = '#e8e5e0'
+      ctx.fillStyle = 'rgba(255,255,255,0.08)'
       ctx.fill()
       ctx.beginPath()
       ctx.arc(cx, cy, inner, 0, 2 * Math.PI)
-      ctx.fillStyle = '#ffffff'
+      ctx.fillStyle = '#111827'
       ctx.fill()
-      ctx.fillStyle = '#a09d98'
+      ctx.fillStyle = '#475569'
       ctx.font = `bold ${size * 0.14}px "DM Mono", monospace`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
@@ -70,17 +70,17 @@ export default function DonutChart({ wins, losses, pushes, winRate }: Props) {
     // Inner circle (donut hole)
     ctx.beginPath()
     ctx.arc(cx, cy, inner, 0, 2 * Math.PI)
-    ctx.fillStyle = '#ffffff'
+    ctx.fillStyle = '#111827'
     ctx.fill()
 
     // Center text
-    ctx.fillStyle = '#1a1916'
+    ctx.fillStyle = '#F1F5F9'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'alphabetic'
     ctx.font = `bold ${size * 0.18}px "DM Mono", monospace`
     ctx.fillText(winRate + '%', cx, cy + size * 0.07)
     ctx.font = `${size * 0.085}px "DM Sans", sans-serif`
-    ctx.fillStyle = '#6b6760'
+    ctx.fillStyle = '#94A3B8'
     ctx.fillText('win rate', cx, cy + size * 0.2)
   }, [wins, losses, pushes, winRate])
 

@@ -26,7 +26,7 @@ export default function CalibrationChart({ buckets }: { buckets: CalibrationBuck
     const barW = gap * 0.38
 
     // Grid lines
-    ctx.strokeStyle = '#e8e5e0'
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)'
     ctx.lineWidth = 1
     ;[0, 25, 50, 75, 100].forEach(v => {
       const y = pad.top + ch - (v / 100) * ch
@@ -34,7 +34,7 @@ export default function CalibrationChart({ buckets }: { buckets: CalibrationBuck
       ctx.moveTo(pad.left, y)
       ctx.lineTo(pad.left + cw, y)
       ctx.stroke()
-      ctx.fillStyle = '#a09d98'
+      ctx.fillStyle = '#475569'
       ctx.font = '10px "DM Sans", sans-serif'
       ctx.textAlign = 'right'
       ctx.fillText(v + '%', pad.left - 6, y + 4)
@@ -44,10 +44,10 @@ export default function CalibrationChart({ buckets }: { buckets: CalibrationBuck
     buckets.forEach((bucket, i) => {
       const cx = pad.left + i * gap + gap / 2
 
-      // Expected bar (light green outline)
+      // Expected bar (blue outline)
       const expH = (bucket.expected / 100) * ch
-      ctx.fillStyle = '#e8f4ee'
-      ctx.strokeStyle = '#2d6a4f'
+      ctx.fillStyle = 'rgba(37,99,235,0.15)'
+      ctx.strokeStyle = '#60A5FA'
       ctx.lineWidth = 1
       ctx.beginPath()
       const eX = cx - barW - 3
@@ -60,30 +60,30 @@ export default function CalibrationChart({ buckets }: { buckets: CalibrationBuck
       if (bucket.actual !== null) {
         const actH = (bucket.actual / 100) * ch
         const isGood = bucket.actual >= bucket.expected - 8
-        ctx.fillStyle = isGood ? '#2d6a4f' : '#e76f51'
+        ctx.fillStyle = isGood ? '#4ADE80' : '#F87171'
         ctx.beginPath()
         ctx.roundRect(cx + 3, pad.top + ch - actH, barW, actH, [3, 3, 0, 0])
         ctx.fill()
 
         // Value label above bar
-        ctx.fillStyle = isGood ? '#2d6a4f' : '#e76f51'
+        ctx.fillStyle = isGood ? '#4ADE80' : '#F87171'
         ctx.font = 'bold 10px "DM Mono", monospace'
         ctx.textAlign = 'center'
         ctx.fillText(bucket.actual + '%', cx + 3 + barW / 2, pad.top + ch - actH - 5)
       } else {
         // No data bar
-        ctx.fillStyle = '#e8e5e0'
+        ctx.fillStyle = 'rgba(255,255,255,0.08)'
         ctx.beginPath()
         ctx.roundRect(cx + 3, pad.top + ch - 8, barW, 8, [3, 3, 0, 0])
         ctx.fill()
-        ctx.fillStyle = '#a09d98'
+        ctx.fillStyle = '#475569'
         ctx.font = '9px "DM Sans", sans-serif'
         ctx.textAlign = 'center'
         ctx.fillText('n/a', cx + 3 + barW / 2, pad.top + ch - 11)
       }
 
       // X-axis label
-      ctx.fillStyle = '#6b6760'
+      ctx.fillStyle = '#94A3B8'
       ctx.font = '11px "DM Sans", sans-serif'
       ctx.textAlign = 'center'
       ctx.fillText(bucket.label, cx, h - 8)

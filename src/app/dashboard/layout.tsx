@@ -1,6 +1,6 @@
-import { UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
 import { LayoutGrid, TrendingUp, Star, FileText, BarChart2 } from 'lucide-react'
+import UserAccountFooter from '@/components/ui/UserAccountFooter'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,14 +9,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className="w-[260px] bg-surface border-r border-border flex flex-col flex-shrink-0">
         {/* Logo + new study */}
         <div className="px-4 pt-5 pb-3.5 border-b border-border/60">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-7 h-7 bg-text-primary rounded-[7px] flex items-center justify-center flex-shrink-0">
-              <svg viewBox="0 0 14 14" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" width="14" height="14">
-                <path d="M7 1L9.5 5.5H12.5L10 8.5L11 13L7 10.5L3 13L4 8.5L1.5 5.5H4.5L7 1Z"/>
-              </svg>
-            </div>
-            <span className="text-[15px] font-semibold tracking-tight">
-              Play<span className="font-serif italic font-normal">book</span>
+          <div className="flex items-center gap-2.5 mb-4">
+            <svg width="26" height="26" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
+              <rect width="96" height="96" rx="22" fill="#2563EB" />
+              <path d="M14 26 Q30 23 48 26 L48 70 Q30 67 14 70 Z" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.4)" strokeWidth="2.5" strokeLinejoin="round" />
+              <path d="M48 26 Q66 23 82 26 L82 70 Q66 67 48 70 Z" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.4)" strokeWidth="2.5" strokeLinejoin="round" />
+              <line x1="48" y1="26" x2="48" y2="70" stroke="rgba(255,255,255,0.55)" strokeWidth="3" />
+              <circle cx="66" cy="56" r="4.5" fill="rgba(255,255,255,0.5)" />
+              <circle cx="74" cy="40" r="4.5" fill="#93C5FD" />
+              <path d="M66 56 Q66 40 74 42" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+            <span className="text-[15px] font-medium tracking-tight text-text-primary">
+              The <span className="text-blue">Playbook</span>
             </span>
           </div>
           <Link
@@ -44,10 +48,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* User footer */}
-        <div className="border-t border-border/60 px-4 py-3 flex items-center gap-2.5">
-          <UserButton afterSignOutUrl="/" />
-          <div className="text-[12.5px] font-medium text-text-primary">My Account</div>
-        </div>
+        <UserAccountFooter />
       </aside>
 
       {/* Main content */}

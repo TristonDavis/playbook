@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { Plus, Info, Trash2 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import { Prediction, Outcome } from '@/types'
 import {
   computeStats,
@@ -56,12 +55,9 @@ export default function TrackerPage() {
   const [deleting, setDeleting]       = useState<string | null>(null)
 
   const load = useCallback(async () => {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from('predictions')
-      .select('*')
-      .order('created_at', { ascending: false })
-    setPredictions((data as Prediction[]) ?? [])
+    const res = await fetch('/api/predictions')
+    const data = res.ok ? await res.json() : []
+    setPredictions(data as Prediction[])
     setLoading(false)
   }, [])
 
@@ -210,8 +206,8 @@ export default function TrackerPage() {
               <CalibrationChart buckets={buckets} />
               <div className="flex gap-4 mt-3">
                 {[
-                  { color: 'bg-accent-light border border-accent', label: 'Expected' },
-                  { color: 'bg-accent', label: 'Actual win %' },
+                  { color: 'bg-blue-light border border-blue', label: 'Expected' },
+                  { color: 'bg-green-400', label: 'Actual win %' },
                 ].map(l => (
                   <div key={l.label} className="flex items-center gap-1.5 text-[11.5px] text-text-secondary">
                     <div className={cn('w-2 h-2 rounded-full', l.color)} />
@@ -234,9 +230,9 @@ export default function TrackerPage() {
               />
               <div className="flex gap-4 mt-3">
                 {[
-                  { color: '#2d6a4f', label: 'Wins' },
-                  { color: '#e76f51', label: 'Losses' },
-                  { color: '#a09d98', label: 'Pushes' },
+                  { color: '#4ADE80', label: 'Wins' },
+                  { color: '#F87171', label: 'Losses' },
+                  { color: '#94A3B8', label: 'Pushes' },
                 ].map(l => (
                   <div key={l.label} className="flex items-center gap-1.5 text-[11.5px] text-text-secondary">
                     <div className="w-2 h-2 rounded-full" style={{ background: l.color }} />
@@ -285,7 +281,7 @@ export default function TrackerPage() {
                   className={cn(
                     'px-3 py-1 rounded-full text-[12px] font-medium border transition-all',
                     filter === f.value
-                      ? 'bg-text-primary text-white border-text-primary'
+                      ? 'bg-accent text-white border-accent'
                       : 'bg-surface text-text-secondary border-border hover:border-text-tertiary'
                   )}
                 >
@@ -326,7 +322,7 @@ export default function TrackerPage() {
                   filtered.map(p => (
                     <tr
                       key={p.id}
-                      className="border-b border-border/60 last:border-0 hover:bg-[#fafaf8] transition-colors"
+                      className="border-b border-border/60 last:border-0 hover:bg-surface-2 transition-colors"
                     >
                       {/* Game */}
                       <td className="px-3.5 py-2.5">

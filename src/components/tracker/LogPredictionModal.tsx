@@ -105,7 +105,7 @@ export default function LogPredictionModal({ open, onClose, onSaved }: Props) {
 
   return (
     <div
-      className="fixed inset-0 bg-text-primary/40 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
       onClick={handleClose}
     >
       <div
@@ -128,7 +128,7 @@ export default function LogPredictionModal({ open, onClose, onSaved }: Props) {
 
           {/* Error banner */}
           {error && (
-            <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-lg px-3.5 py-2.5 text-[12.5px]">
+            <div className="flex items-center gap-2.5 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-3.5 py-2.5 text-[12.5px]">
               <AlertCircle size={14} className="shrink-0" />
               {error}
             </div>

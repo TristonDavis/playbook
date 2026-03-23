@@ -15,7 +15,8 @@ export async function createClient() {
     accessToken = await authObject.getToken({
       template: process.env.CLERK_JWT_TEMPLATE || 'supabase',
     })
-  } catch {
+  } catch (err) {
+    console.error('[supabase/server] getToken failed:', err)
     accessToken = null
   }
 
