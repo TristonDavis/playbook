@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Search, Plus } from 'lucide-react'
 import Link from 'next/link'
@@ -17,6 +17,14 @@ const TYPE_COLORS: Record<StudyType, string> = {
 const VALID_TYPES: StudyType[] = ['matchup', 'stats', 'analysis']
 
 export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardContent />
+    </Suspense>
+  )
+}
+
+function DashboardContent() {
   const searchParams = useSearchParams()
   const rawType = searchParams.get('type')
   const typeFilter: StudyType | null = VALID_TYPES.includes(rawType as StudyType)
