@@ -2,9 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { useAuth } from '@clerk/nextjs'
-import { createClient } from '@/lib/supabase/client'
-import { Study, StudyInsert } from '@/types'
+import { Study } from '@/types'
 import StudyEditor from '@/components/editor/StudyEditor'
 import RightPanel from '@/components/editor/RightPanel'
 import EditorToolbar from '@/components/editor/EditorToolbar'
@@ -13,7 +11,6 @@ import StudyListSidebar from '@/components/editor/StudyListSidebar'
 export default function StudyPage() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
-  const { userId } = useAuth()
   const [study, setStudy] = useState<Study | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -26,46 +23,35 @@ export default function StudyPage() {
       return
     }
     async function load() {
-      const supabase = createClient()
-      const { data } = await supabase.from('studies').select('*').eq('id', id).single()
-      setStudy((data as Study) ?? null)
+      const res = await fetch(`/api/studies?id=${id}`)
+      const data = res.ok ? await res.json() : null
+      setStudy(data as Study ?? null)
       setLoading(false)
     }
     load()
   }, [id])
 
   const handleSave = useCallback(async (updates: Partial<Study>) => {
-    if (!userId) return
     setSaving(true)
-    const supabase = createClient()
 
-if (id === 'new') {
-  const studyInsert: StudyInsert = {
-    user_id: userId,
-    title: updates.title || 'Untitled Study',
-    type: updates.type || 'analysis',
-    sport: updates.sport || 'NFL',
-    body: updates.body || '',
-    confidence: updates.confidence || 50,
-    spread: updates.spread ?? null,
-    total: updates.total ?? null,
-    tags: updates.tags || [],
-    pinned: updates.pinned ?? false,
-  }
+    if (id === 'new') {
+      const res = await fetch('/api/studies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      })
+      if (res.ok) {
+        const data = await res.json() as Study
+        router.replace(`/dashboard/study/${data.id}`)
+      }
+    } else {
+      await fetch('/api/studies', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, ...updates }),
+      })
+    }
 
-  const { data, error } = await supabase
-    .from('studies')
-    .insert(studyInsert)
-    .select()
-    .single()
-
-  if (data) router.replace(`/dashboard/study/${(data as Study).id}`)
-} else {
-await supabase
-  .from('studies')
-  .update({ ...updates, updated_at: new Date().toISOString() })
-  .eq('id', id)
-}
     setSaving(false)
   }, [id, router])
 

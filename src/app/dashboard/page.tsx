@@ -4,7 +4,6 @@ import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Search, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import { Study, StudyType } from '@/types'
 import { formatDate, cn } from '@/lib/utils'
 
@@ -37,22 +36,10 @@ function DashboardContent() {
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient()
-
-      // Build base query — cast to any to allow conditional .eq() without
-      // TypeScript losing the return type through the chained builder.
-      // We explicitly cast data to Study[] on the way out, which is the
-      // safe boundary and matches what the DB actually returns.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let query: any = supabase
-        .from('studies')
-        .select('*')
-        .order('updated_at', { ascending: false })
-
-      if (typeFilter) query = query.eq('type', typeFilter)
-
-      const { data } = await query
-      setStudies((data as Study[]) ?? [])
+      const url = typeFilter ? `/api/studies?type=${typeFilter}` : '/api/studies'
+      const res = await fetch(url)
+      const data = res.ok ? await res.json() : []
+      setStudies(data as Study[])
       setLoading(false)
     }
     load()

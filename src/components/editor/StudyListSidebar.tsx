@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Search, Plus } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import { Study, StudyType } from '@/types'
 import { formatDate, cn } from '@/lib/utils'
 
@@ -19,9 +18,9 @@ export default function StudyListSidebar({ activeId }: { activeId?: string }) {
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient()
-      const { data } = await supabase.from('studies').select('id,title,type,sport,tags,updated_at').order('updated_at', { ascending: false })
-      setStudies((data as Study[]) ?? [])
+      const res = await fetch('/api/studies')
+      const data = res.ok ? await res.json() : []
+      setStudies(data as Study[])
     }
     load()
   }, [])
@@ -37,7 +36,7 @@ export default function StudyListSidebar({ activeId }: { activeId?: string }) {
       <div className="px-4 pt-[18px] pb-3 border-b border-border/60 bg-surface">
         <div className="flex items-center justify-between mb-2.5">
           <h2 className="text-[15px] font-semibold tracking-tight">Studies</h2>
-          <Link href="/dashboard/study/new" className="w-6 h-6 flex items-center justify-center rounded-[5px] bg-accent text-white hover:bg-[#245a42] transition-colors">
+          <Link href="/dashboard/study/new" className="w-6 h-6 flex items-center justify-center rounded-[5px] bg-accent text-white hover:bg-[#1d4ed8] transition-colors">
             <Plus size={13} />
           </Link>
         </div>

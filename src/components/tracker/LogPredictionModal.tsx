@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { X, AlertCircle } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import { Study, PickType, Outcome } from '@/types'
 import { cn } from '@/lib/utils'
 
@@ -36,11 +35,9 @@ export default function LogPredictionModal({ open, onClose, onSaved }: Props) {
   useEffect(() => {
     if (!open) return
     setError(null)
-    createClient()
-      .from('studies')
-      .select('id, title, sport')
-      .order('updated_at', { ascending: false })
-      .then(({ data }) => setStudies((data as Study[]) ?? []))
+    fetch('/api/studies')
+      .then(res => res.ok ? res.json() : [])
+      .then((data: Study[]) => setStudies(data))
   }, [open])
 
   function set<K extends keyof typeof form>(key: K, value: typeof form[K]) {
